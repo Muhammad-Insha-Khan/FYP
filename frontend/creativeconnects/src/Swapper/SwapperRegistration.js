@@ -1,9 +1,10 @@
-import React,{useState} from 'react'
+import React, { useState } from 'react';
 import '../styles/SwapperRegistration.css';
 import 'react-phone-input-2/lib/style.css'; // Import styles for react-phone-input-2
 import PhoneInput from 'react-phone-input-2';
+import Swal from 'sweetalert2'; // Import SweetAlert2
+
 function SwapperRegistration() {
- 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -19,7 +20,7 @@ function SwapperRegistration() {
 
   // List of available expertise options
   const expertiseOptions = [
-    'Web Development', 'Graphic Design', 'App Development', 'Technical Support', 'SEO', 
+    'Web Development', 'Graphic Design', 'App Development', 'Technical Support', 'SEO',
     'Data Analysis', 'Marketing', 'Photography', 'Project Management', 'UI/UX Design',
     'Copywriting', 'Blockchain', 'AI & Machine Learning', 'Business Strategy', 'Video Editing'
   ];
@@ -40,10 +41,23 @@ function SwapperRegistration() {
         expertiseHave: [...formData.expertiseHave, selectedExpertise],
         expertiseToAddHave: '' // Clear the input after adding
       });
+      Swal.fire({
+        icon: 'success',
+        title: 'Expertise Added',
+        text: 'You have successfully added expertise.',
+      });
     } else if (formData.expertiseHave.length >= 5) {
-      alert('You can only select up to 5 expertise.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Limit Exceeded',
+        text: 'You can only select up to 5 expertise.',
+      });
     } else {
-      alert('Please select a valid expertise.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Expertise',
+        text: 'Please select a valid expertise.',
+      });
     }
   };
 
@@ -55,18 +69,61 @@ function SwapperRegistration() {
         expertiseLookingFor: [...formData.expertiseLookingFor, selectedExpertise],
         expertiseToAddLookingFor: '' // Clear the input after adding
       });
+      Swal.fire({
+        icon: 'success',
+        title: 'Expertise Added',
+        text: 'You have successfully added expertise.',
+      });
     } else if (formData.expertiseLookingFor.length >= 5) {
-      alert('You can only select up to 5 expertise.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Limit Exceeded',
+        text: 'You can only select up to 5 expertise.',
+      });
     } else {
-      alert('Please select a valid expertise.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Expertise',
+        text: 'Please select a valid expertise.',
+      });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-  };
 
+    try {
+      const response = await fetch('http://localhost:5000/api/skillswapper/register', { // Update the URL based on your backend URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Registration Successful',
+          text: result.message,
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.message || 'An error occurred during registration',
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong. Please try again later.',
+      });
+    }
+  };
   const handleClear = () => {
     setFormData({
       firstName: '',
@@ -216,4 +273,5 @@ function SwapperRegistration() {
     </div>
   );
 }
-export default SwapperRegistration
+
+export default SwapperRegistration;

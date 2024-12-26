@@ -72,31 +72,81 @@ const SellerRegistration = () => {
       });
     }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const validateForm = () => {
     if (formData.password !== formData.confirmPassword) {
       Swal.fire({
         title: 'Password Mismatch',
         text: 'Passwords do not match.',
         icon: 'error',
         background: '#00796b',
-        color: 'white',
+        color: '#4caf50',
       });
-      return  false;
+      return false;
     }
+
     if (!formData.email.includes('@')) {
       Swal.fire({
         title: 'Invalid Email',
         text: 'Please enter a valid email address.',
         icon: 'error',
         background: '#00796b',
-        color: 'white',
+        color: '#4caf50',
       });
       return false;
     }
-    console.log('Form Data:', formData);
+
+    return true;
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateForm()) {
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/api/sellers/register', {
+      method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Swal.fire({
+        title: 'Success',
+        text: 'Registration successful. Check your email for confirmation.',
+        icon: 'success',
+        background: '#00796b',
+        color: 'white',
+      });
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        fieldDomain: '',
+        skills: [],
+        skillToAdd: '',
+      });
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: data.message,
+        icon: 'error',
+        background: '#00796b',
+        color: 'white',
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 
   const handleClear = () => {
     setFormData({
